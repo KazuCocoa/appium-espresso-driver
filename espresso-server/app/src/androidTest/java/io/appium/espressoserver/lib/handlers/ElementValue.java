@@ -1,9 +1,12 @@
 package io.appium.espressoserver.lib.handlers;
 
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.contrib.PickerActions;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
+import android.widget.TimePicker;
 
 import io.appium.espressoserver.lib.handlers.exceptions.AppiumException;
 import io.appium.espressoserver.lib.handlers.exceptions.InvalidArgumentException;
@@ -34,6 +37,16 @@ public class ElementValue implements RequestHandler<ElementValueParams, Void> {
             if (view instanceof NumberPicker) {
                 ((NumberPicker) view).setValue(Integer.parseInt(params.getValue()));
                 return null;
+            }
+            if (view instanceof DatePicker) {
+                ViewInteraction viewInteraction = Element.getViewInteractionById(elementId);
+                // TODO: should parse `params.getValue()` as year, monthOfYear and dayOfMonth
+                viewInteraction.perform(PickerActions.setDate(1, 1, 1));
+            }
+            if (view instanceof TimePicker) {
+                ViewInteraction viewInteraction = Element.getViewInteractionById(elementId);
+                // TODO: should parse `params.getValue()` as hours and minutes
+                viewInteraction.perform(PickerActions.setTime(1, 1));
             }
         } catch (NumberFormatException e) {
             throw new InvalidArgumentException(String.format("Cannot convert '%s' to an integer",

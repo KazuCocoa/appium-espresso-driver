@@ -22,15 +22,22 @@ import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.contrib.PickerActions;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Checkable;
+import android.widget.DatePicker;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.TimePicker;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
@@ -186,6 +193,24 @@ public class ViewElement {
         if (view instanceof NumberPicker) {
             return new ViewText(((NumberPicker) view).getValue());
         }
+        if (view instanceof DatePicker) {
+            int day  = ((DatePicker) view).getDayOfMonth();
+            int month = ((DatePicker) view).getMonth();
+            int year = ((DatePicker) view).getYear();
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(year, month, day);
+
+            // The format is used in android:maxDate and android:minDate
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+            String formattedDate = sdf.format(calendar.getTime());
+            return new ViewText(formattedDate, false);
+        }
+        if (view instanceof TimePicker) {
+            int hour = ((TimePicker) view).getHour();
+            int minute = ((TimePicker) view).getMinute();
+            return new ViewText(String.format("%02d:%02d", hour, minute), false);
+        }
+
         if (view instanceof TextView) {
             CharSequence textValue = ((TextView) view).getText();
             CharSequence hintValue = ((TextView) view).getHint();
